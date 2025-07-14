@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 245, 245, 245;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 18, 18, 18;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: rgb(var(--background-rgb));
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-white {
+    background-color: rgb(32, 32, 32);
+  }
+
+  .text-gray-500 {
+    color: rgb(156, 163, 175);
+  }
+
+  .text-gray-600 {
+    color: rgb(209, 213, 219);
+  }
+
+  .text-gray-700 {
+    color: rgb(229, 231, 235);
+  }
+
+  .text-gray-800 {
+    color: rgb(243, 244, 246);
+  }
+}
