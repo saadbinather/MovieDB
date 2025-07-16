@@ -1,0 +1,28 @@
+{
+  "genres": [
+    {
+      "id": 1,
+      "name": "Action",
+      "description": "High-energy films with intense sequences and continuous motion",
+      "movies": ["Die Hard", "Mad Max: Fury Road", "The Dark Knight"]
+    },
+    {
+      "id": 2,
+      "name": "Drama",
+      "description": "Character-driven narratives focusing on emotional themes",
+      "movies": ["The Shawshank Redemption", "Forrest Gump", "The Godfather"]
+    },
+    {
+      "id": 3,
+      "name": "Science Fiction",
+      "description": "Stories exploring advanced technology and scientific concepts",
+      "movies": ["Blade Runner", "The Matrix", "Interstellar"]
+    },
+    {
+      "id": 4,
+      "name": "Comedy",
+      "description": "Light-hearted films designed to make audiences laugh",
+      "movies": ["The Hangover", "Bridesmaids", "Superbad"]
+    }
+  ]
+}

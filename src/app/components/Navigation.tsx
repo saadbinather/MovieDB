@@ -49,6 +49,16 @@ export default function Navigation() {
           >
             Directors
           </Link>
+          <Link
+            href="/help"
+            className={`px-6 py-2 rounded-lg transition-colors ${
+              pathname === "/help"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
+            }`}
+          >
+            Help
+          </Link>
         </div>
       </div>
     </nav>

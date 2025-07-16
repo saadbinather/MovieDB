@@ -11,7 +11,7 @@ export const data = {
     },
     {
       id: "2",
-      title: "The Great Gatsby",
+      title: "tenet",
       directorId: "d3",
       description:
         "A mysterious millionaire throws lavish parties in 1920s New York.",

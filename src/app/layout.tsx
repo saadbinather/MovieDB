@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "./components/Navigation";
+import Help from "../components/Help";
 
 export const metadata: Metadata = {
   title: "Movie Database",
@@ -14,7 +15,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
+      <body>
         <div className="flex flex-col min-h-screen">
           <Navigation />
           <main className="flex-1 container mx-auto px-4 pt-20">
