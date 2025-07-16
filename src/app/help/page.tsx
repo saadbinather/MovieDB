@@ -1,93 +1,107 @@
 "use client";
 
-import Help from "../../components/Help";
+import Image from "next/image";
 import Link from "next/link";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+
+import Help from "../../components/Help";
 
 export default function HelpPage() {
   const helpCategories = [
     {
       title: "FAQs",
       description:
-        "Find answers to common questions about using our movie database",
+        "Find answers to common questions about using our movie database.",
       href: "/help/faqs",
-      icon: "❓",
+      icon: "/question-mark.svg",
+      alt: "FAQ icon",
     },
     {
       title: "Privacy Policy",
-      description:
-        "Learn about how we handle and protect your personal information",
+      description: "Learn how we handle and protect your personal information.",
       href: "/help/privacy",
-      icon: "🔒",
+      icon: "/privacy.svg",
+      alt: "Privacy icon",
     },
     {
       title: "Contact Us",
       description:
-        "Get in touch with our support team for personalized assistance",
+        "Get in touch with our support team for personalized assistance.",
       href: "/help/contact",
-      icon: "📧",
+      icon: "/contact.png",
+      alt: "Contact icon",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-8">
-        <h1 className="text-4xl font-bold mb-4 text-center text-gray-800">
-          Help Center
-        </h1>
-        <p className="text-center text-gray-600 mb-12">
-          Welcome to our help center. How can we assist you today?
-        </p>
+    <div className="min-h-screen bg-muted/50 py-12 px-4 md:px-8">
+      <div className="max-w-5xl mx-auto space-y-10">
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">
+            Help Center
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            Welcome to our help center. How can we assist you today?
+          </p>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid gap-6 sm:grid-cols-2">
           {helpCategories.map((category) => (
-            <Link
-              key={category.href}
-              href={category.href}
-              className="block bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow p-6"
-            >
-              <div className="flex items-start gap-4">
-                <div className="text-3xl">{category.icon}</div>
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                    {category.title}
-                  </h2>
-                  <p className="text-gray-600">{category.description}</p>
-                </div>
-              </div>
+            <Link href={category.href} key={category.href}>
+              <Card className="hover:shadow-lg transition-shadow h-full">
+                <CardContent className="flex gap-4 items-start p-6">
+                  <Image
+                    src={category.icon}
+                    alt={category.alt}
+                    width={40}
+                    height={40}
+                    className="mt-1"
+                  />
+                  <div>
+                    <h2 className="text-xl font-semibold text-foreground">
+                      {category.title}
+                    </h2>
+                    <p className="text-muted-foreground">
+                      {category.description}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </Link>
           ))}
         </div>
 
-        <div className="mt-12 bg-white rounded-xl shadow-md p-8">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        <div className="bg-background rounded-xl shadow p-8">
+          <h2 className="text-2xl font-semibold text-foreground mb-4">
             Quick Help
           </h2>
-          <div className="space-y-4">
-            <p className="text-gray-600">
-              Our movie database provides comprehensive information about
-              movies, directors, and genres. You can browse through our
-              collection, search for specific titles, and discover new films
-              based on your interests.
+          <p className="text-muted-foreground mb-6">
+            Our movie database provides detailed information about movies,
+            directors, and genres. Browse, search, and discover content tailored
+            to your interests.
+          </p>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-blue-800 font-semibold mb-2">
+              Need immediate assistance?
+            </h3>
+            <p className="text-blue-700">
+              Email us at{" "}
+              <a
+                href="mailto:support@moviedb.com"
+                className="underline hover:text-blue-900"
+              >
+                support@moviedb.com
+              </a>
             </p>
-            <div className="bg-blue-50 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-800 mb-2">
-                Need immediate assistance?
-              </h3>
-              <p className="text-blue-600">
-                Email us at{" "}
-                <a
-                  href="mailto:support@moviedb.com"
-                  className="underline hover:text-blue-800"
-                >
-                  support@moviedb.com
-                </a>
-              </p>
-            </div>
           </div>
         </div>
       </div>
 
-      <Help />
+      <div className="mt-16">
+        <Help />
+      </div>
     </div>
   );
 }

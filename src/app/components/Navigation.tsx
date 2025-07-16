@@ -1,66 +1,115 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { LogOut, User } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 bg-purple-700 dark:bg-gray-800 shadow-md z-50">
-      <div className="max-w-6xl mx-auto flex items-center h-16 px-4">
-        <div className="flex-1 flex justify-center items-center gap-4">
-          <Link
-            href="/"
-            className={`text-2xl px-4 py-2 rounded-lg transition-colors hover:bg-gray-200 ${
-              pathname === "/" ? "bg-blue-600" : ""
-            }`}
-          >
-            🏠
-          </Link>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto">
+        <div className="flex h-14 items-center justify-between">
+          {/* Left side - App logo/home */}
+          <div className="flex items-center gap-4">
+            <Button
+              variant={pathname === "/" ? "default" : "ghost"}
+              className="text-sm flex items-center gap-2"
+              asChild
+            >
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src={pathname === "/" ? "/whitehome.svg" : "/home.svg"}
+                  alt="Home"
+                  width={18}
+                  height={18}
+                  className="w-[18px] h-[18px]"
+                />
+                {!user && <span className="hidden sm:inline">Movie App</span>}
+              </Link>
+            </Button>
+          </div>
 
-          <Link
-            href="/movies"
-            className={`px-6 py-2 rounded-lg transition-colors ${
-              pathname === "/movies"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-            }`}
-          >
-            Movies
-          </Link>
-          <Link
-            href="/genres"
-            className={`px-6 py-2 rounded-lg transition-colors ${
-              pathname === "/genres"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-            }`}
-          >
-            Genres
-          </Link>
-          <Link
-            href="/directors"
-            className={`px-6 py-2 rounded-lg transition-colors ${
-              pathname === "/directors"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-            }`}
-          >
-            Directors
-          </Link>
-          <Link
-            href="/help"
-            className={`px-6 py-2 rounded-lg transition-colors ${
-              pathname === "/help"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200"
-            }`}
-          >
-            Help
-          </Link>
+          {/* Center - Main navigation (only when authenticated) */}
+          {user && (
+            <div className="flex items-center gap-1 sm:gap-4">
+              <Button
+                variant={pathname === "/movies" ? "default" : "ghost"}
+                className="text-sm"
+                asChild
+              >
+                <Link href="/movies">Movies</Link>
+              </Button>
+
+              <Button
+                variant={pathname === "/genres" ? "default" : "ghost"}
+                className="text-sm"
+                asChild
+              >
+                <Link href="/genres">Genres</Link>
+              </Button>
+
+              <Button
+                variant={pathname === "/directors" ? "default" : "ghost"}
+                className="text-sm"
+                asChild
+              >
+                <Link href="/directors">Directors</Link>
+              </Button>
+
+              <Button
+                variant={pathname === "/help" ? "default" : "ghost"}
+                className="text-sm"
+                asChild
+              >
+                <Link href="/help">Help</Link>
+              </Button>
+            </div>
+          )}
+
+          {/* Right side - User menu (only when authenticated) */}
+          {user && (
+            <div className="flex items-center gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">{user.email}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuLabel className="font-normal text-sm text-muted-foreground">
+                    {user.email}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

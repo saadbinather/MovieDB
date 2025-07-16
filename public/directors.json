@@ -1,0 +1,32 @@
+[
+  {
+    "id": "d1",
+    "name": "Christopher Nolan",
+    "biography": "British-American director known for complex storytelling and visual innovation.",
+    "url": "https://variety.com/wp-content/uploads/2020/12/Christopher_Nolan.png"
+  },
+  {
+    "id": "d3",
+    "name": "Baz Luhrmann",
+    "biography": "Australian director known for visually extravagant films like Moulin Rouge! and The Great Gatsby.",
+    "url": "https://variety.com/wp-content/uploads/2023/12/Baz-Luhrmann.png"
+  },
+  {
+    "id": "d4",
+    "name": "Bong Joon-ho",
+    "biography": "South Korean filmmaker acclaimed for combining drama, social commentary, and thrills.",
+    "url": "https://variety.com/wp-content/uploads/2020/12/Bong_Joon_Ho.png"
+  },
+  {
+    "id": "d5",
+    "name": "The Wachowskis",
+    "biography": "Sibling duo behind groundbreaking sci-fi films including The Matrix trilogy.",
+    "url": "https://variety.com/wp-content/uploads/2021/12/Lana_Wachowski.png"
+  },
+  {
+    "id": "d6",
+    "name": "Damien Chazelle",
+    "biography": "American director known for musical dramas like Whiplash and La La Land.",
+    "url": "https://variety.com/wp-content/uploads/2022/12/Damien_Chazelle_v4.png"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "g1",
+    "name": "Science Fiction"
+  },
+  {
+    "id": "g3",
+    "name": "Adventure"
+  },
+  {
+    "id": "g4",
+    "name": "Drama"
+  },
+  {
+    "id": "g5",
+    "name": "Thriller"
+  }
+]

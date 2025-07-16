@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 import Navigation from "./components/Navigation";
-import Help from "../components/Help";
+import { AuthProvider } from "@/contexts/AuthContext";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Movie Database",
-  description: "Browse movies, genres, and directors",
+  title: "Movie App",
+  description: "A modern movie application built with Next.js",
 };
 
 export default function RootLayout({
@@ -15,13 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
-        <div className="flex flex-col min-h-screen">
+      <body className={inter.className}>
+        <AuthProvider>
           <Navigation />
-          <main className="flex-1 container mx-auto px-4 pt-20">
-            {children}
-          </main>
-        </div>
+          <main className="pt-16">{children}</main>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );

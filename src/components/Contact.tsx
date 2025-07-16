@@ -1,35 +1,79 @@
 "use client";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
 export default function Contact() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold mb-6">Contact Us</h2>
-      <div className="bg-white rounded-lg p-6 space-y-6">
-        <div>
-          <h3 className="font-semibold mb-2">Customer Support</h3>
-          <p className="text-gray-600">Email: support@moviedb.com</p>
-          <p className="text-gray-600">Phone: 1-800-MOVIES</p>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-2">Business Inquiries</h3>
-          <p className="text-gray-600">Email: business@moviedb.com</p>
-        </div>
-        <div>
-          <h3 className="font-semibold mb-2">Office Address</h3>
-          <p className="text-gray-600">
-            MovieDB Headquarters
-            <br />
-            123 Cinema Street
-            <br />
-            Hollywood, CA 90028
-          </p>
-        </div>
-        <div className="pt-4 border-t">
-          <p className="text-sm text-gray-500">
-            We typically respond to inquiries within 24-48 business hours.
-          </p>
-        </div>
-      </div>
-    </div>
+    <main className="max-w-4xl mx-auto px-6 md:px-8 py-16 space-y-12">
+      <section className="text-center">
+        <h1 className="text-4xl font-bold text-foreground tracking-tight">
+          Contact Us
+        </h1>
+        <p className="text-muted-foreground mt-3 text-lg">
+          Whether you have a question, feedback, or a partnership idea — we're
+          here to talk.
+        </p>
+      </section>
+
+      <Card className="shadow-sm border border-border bg-background rounded-2xl">
+        <CardContent className="p-8 space-y-8">
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-foreground">
+              Customer Support
+            </h2>
+            <p className="text-muted-foreground">
+              📧 Email:{" "}
+              <a
+                href="mailto:support@moviedb.com"
+                className="underline hover:text-primary transition-colors"
+              >
+                support@moviedb.com
+              </a>
+            </p>
+            <p className="text-muted-foreground">📞 Phone: 1-800-MOVIES</p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-foreground">
+              Business Inquiries
+            </h2>
+            <p className="text-muted-foreground">
+              📧 Email:{" "}
+              <a
+                href="mailto:business@moviedb.com"
+                className="underline hover:text-primary transition-colors"
+              >
+                business@moviedb.com
+              </a>
+            </p>
+          </div>
+
+          <Separator />
+
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-foreground">
+              Office Address
+            </h2>
+            <address className="not-italic text-muted-foreground leading-relaxed">
+              MovieDB Headquarters
+              <br />
+              123 Cinema Street
+              <br />
+              Hollywood, CA 90028
+            </address>
+          </div>
+
+          <div className="pt-6 border-t border-border text-sm text-muted-foreground">
+            <p>
+              We typically respond within <strong>24–48 business hours</strong>.
+              Thanks for your patience!
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </main>
   );
 }

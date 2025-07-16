@@ -7,7 +7,9 @@
       "releaseYear": 2010,
       "rating": 8.8,
       "directorId": "d1",
-      "genreId": "g1"
+      "genreId": "g1",
+      "url": "https://www.imdb.com/title/tt1375666/",
+      "posterUrl": "https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_%282010%29_theatrical_poster.jpg"
     },
     {
       "id": "2",
@@ -16,7 +18,9 @@
       "releaseYear": 1994,
       "rating": 9.3,
       "directorId": "d2",
-      "genreId": "g2"
+      "genreId": "g2",
+      "url": "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg",
+      "posterUrl": "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg"
     },
     {
       "id": "3",
@@ -25,7 +29,9 @@
       "releaseYear": 2014,
       "rating": 8.6,
       "directorId": "d1",
-      "genreId": "g1"
+      "genreId": "g1",
+      "url": "https://www.imdb.com/title/tt0816692/",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg"
     },
     {
       "id": "4",
@@ -34,7 +40,9 @@
       "releaseYear": 2008,
       "rating": 9.0,
       "directorId": "d1",
-      "genreId": "g1"
+      "genreId": "g1",
+      "url": "https://www.imdb.com/title/tt1375666/",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
     },
     {
       "id": "5",
@@ -43,7 +51,9 @@
       "releaseYear": 1994,
       "rating": 8.9,
       "directorId": "d3",
-      "genreId": "g2"
+      "genreId": "g2",
+      "url": "https://www.imdb.com/title/tt0110912/",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg"
     },
     {
       "id": "6",
@@ -51,34 +61,69 @@
       "description": "A computer programmer discovers that reality as he knows it is a simulation created by machines, and joins a rebellion to break free.",
       "releaseYear": 1999,
       "rating": 8.7,
-      "directorId": "d4",
-      "genreId": "g1"
+      "directorId": "d5",
+      "genreId": "g1",
+      "url": "https://www.imdb.com/title/tt0108178/",
+      "posterUrl": "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg"
+    }
+  ],
+  "directors": [
+    {
+      "id": "d1",
+      "name": "Christopher Nolan",
+      "biography": "British-American director known for complex storytelling and visual innovation.",
+      "url": "https://variety.com/wp-content/uploads/2020/12/Christopher_Nolan.png"
+    },
+    {
+      "id": "d2",
+      "name": "Frank Darabont",
+      "biography": "American director known for dramatic storytelling and character development.",
+      "url": "https://variety.com/wp-content/uploads/2020/12/Frank_Darabont.png"
+    },
+    {
+      "id": "d3",
+      "name": "Quentin Tarantino",
+      "biography": "American director known for nonlinear narratives and pop culture references.",
+      "url": "https://variety.com/wp-content/uploads/2020/12/Quentin_Tarantino.png"
+    },
+    {
+      "id": "d4",
+      "name": "Bong Joon-ho",
+      "biography": "South Korean filmmaker acclaimed for combining drama, social commentary, and thrills.",
+      "url": "https://variety.com/wp-content/uploads/2020/12/Bong_Joon_Ho.png"
+    },
+    {
+      "id": "d5",
+      "name": "The Wachowskis",
+      "biography": "Sibling duo behind groundbreaking sci-fi films including The Matrix trilogy.",
+      "url": "https://variety.com/wp-content/uploads/2021/12/Lana_Wachowski.png"
     }
   ],
   "genres": [
     {
-      "id": 1,
-      "name": "Action",
-      "description": "High-energy films with intense sequences and continuous motion",
-      "movies": ["Die Hard", "Mad Max: Fury Road", "The Dark Knight"]
-    },
-    {
-      "id": 2,
-      "name": "Drama",
-      "description": "Character-driven narratives focusing on emotional themes",
-      "movies": ["The Shawshank Redemption", "Forrest Gump", "The Godfather"]
-    },
-    {
-      "id": 3,
+      "id": "g1",
       "name": "Science Fiction",
-      "description": "Stories exploring advanced technology and scientific concepts",
-      "movies": ["Blade Runner", "The Matrix", "Interstellar"]
+      "description": "Stories exploring advanced technology and scientific concepts"
     },
     {
-      "id": 4,
+      "id": "g2",
+      "name": "Drama",
+      "description": "Character-driven narratives focusing on emotional themes"
+    },
+    {
+      "id": "g3",
+      "name": "Action",
+      "description": "High-energy films with intense sequences and continuous motion"
+    },
+    {
+      "id": "g4",
       "name": "Comedy",
-      "description": "Light-hearted films designed to make audiences laugh",
-      "movies": ["The Hangover", "Bridesmaids", "Superbad"]
+      "description": "Light-hearted films designed to make audiences laugh"
+    },
+    {
+      "id": "g5",
+      "name": "Thriller",
+      "description": "Suspenseful films that keep audiences on the edge of their seats"
     }
   ]
 }
