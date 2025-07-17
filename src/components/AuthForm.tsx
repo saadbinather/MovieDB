@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -10,9 +11,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface AuthFormProps {
   mode: "login" | "signup";
@@ -24,36 +25,64 @@ export default function AuthForm({ mode, onToggleMode }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { login, signup } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const success =
-        mode === "login"
-          ? await login(email, password)
-          : await signup(email, password);
+      if (mode === "login") {
+        const result = await signIn("credentials", {
+          email,
+          password,
+          redirect: false,
+        });
 
-      if (success) {
-        toast({
-          title: mode === "login" ? "Welcome back!" : "Account created!",
-          description:
-            mode === "login"
-              ? "You have been logged in successfully."
-              : "Your account has been created and you are now logged in.",
-        });
+        if (result?.error) {
+          toast({
+            title: "Login failed",
+            description: "Invalid email or password.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "You have been logged in successfully.",
+          });
+          router.refresh();
+        }
       } else {
-        toast({
-          title: "Authentication failed",
-          description:
-            mode === "login"
-              ? "Invalid email or password."
-              : "Failed to create account. Please try again.",
-          variant: "destructive",
+        // Signup
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
         });
+
+        if (response.ok) {
+          toast({
+            title: "Account created!",
+            description: "Please sign in with your new account.",
+          });
+          // Auto-login after successful signup
+          await signIn("credentials", {
+            email,
+            password,
+            redirect: false,
+          });
+          router.refresh();
+        } else {
+          const error = await response.json();
+          toast({
+            title: "Signup failed",
+            description: error.message || "Failed to create account.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({

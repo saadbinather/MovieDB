@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession, signOut } from "next-auth/react";
 import { LogOut, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -17,10 +17,10 @@ import {
 
 export default function Navigation() {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { data: session } = useSession();
 
   const handleLogout = () => {
-    logout();
+    signOut();
   };
 
   return (
@@ -42,13 +42,13 @@ export default function Navigation() {
                   height={18}
                   className="w-[18px] h-[18px]"
                 />
-                {!user && <span className="hidden sm:inline">Movie App</span>}
+                {!session && <span className="hidden sm:inline">Movie App</span>}
               </Link>
             </Button>
           </div>
 
           {/* Center - Main navigation (only when authenticated) */}
-          {user && (
+          {session && (
             <div className="flex items-center gap-1 sm:gap-4">
               <Button
                 variant={pathname === "/movies" ? "default" : "ghost"}
@@ -85,19 +85,19 @@ export default function Navigation() {
           )}
 
           {/* Right side - User menu (only when authenticated) */}
-          {user && (
+          {session && (
             <div className="flex items-center gap-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">
                     <User className="h-4 w-4" />
-                    <span className="hidden sm:inline">{user.email}</span>
+                    <span className="hidden sm:inline">{session.user?.email}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuLabel className="font-normal text-sm text-muted-foreground">
-                    {user.email}
+                    {session.user?.email}
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>

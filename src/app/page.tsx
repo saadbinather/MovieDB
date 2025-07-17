@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import AuthForm from "@/components/AuthForm";
-import data from "./data/movies.json";
 import Link from "next/link";
 import {
   Card,
@@ -15,22 +14,89 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Star, Calendar, Film } from "lucide-react";
 import Image from "next/image";
+import { useToast } from "@/hooks/use-toast";
 
-// Helper function to find genre by ID
-const getGenre = (genreId: string) => {
-  return data.genres.find((g) => g.id === genreId);
-};
+interface Movie {
+  id: string;
+  title: string;
+  description: string;
+  releaseYear: number;
+  rating: number;
+  directorId: string;
+  genreId: string;
+  posterUrl: string;
+  url?: string;
+}
+
+interface Genre {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface Director {
+  id: string;
+  name: string;
+  biography: string;
+  url: string;
+}
+
+interface ApiData {
+  movies: Movie[];
+  genres: Genre[];
+  directors: Director[];
+}
 
 export default function Home() {
-  const { user, isLoading } = useAuth();
+  const { data: session, status } = useSession();
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [data, setData] = useState<ApiData | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+  const { toast } = useToast();
 
   const toggleAuthMode = () => {
     setAuthMode(authMode === "login" ? "signup" : "login");
   };
 
+  // Fetch data from API when user is authenticated
+  useEffect(() => {
+    if (session) {
+      const fetchData = async () => {
+        try {
+          const response = await fetch("/api/data");
+          if (response.ok) {
+            const apiData = await response.json();
+            setData(apiData);
+          } else {
+            toast({
+              title: "Error",
+              description: "Failed to fetch movie data",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          toast({
+            title: "Error",
+            description: "Failed to fetch movie data",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoadingData(false);
+        }
+      };
+
+      fetchData();
+    }
+  }, [session, toast]);
+
+  // Helper function to find genre by ID
+  const getGenre = (genreId: string) => {
+    return data?.genres.find((g) => g.id === genreId);
+  };
+
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="container mx-auto py-10">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
@@ -42,7 +108,7 @@ export default function Home() {
   }
 
   // Show authentication form if user is not logged in
-  if (!user) {
+  if (!session) {
     return (
       <div className="container mx-auto py-10">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
@@ -59,7 +125,41 @@ export default function Home() {
     );
   }
 
-  // Show movie content if user is authenticated
+  // Show loading state while fetching movie data
+  if (isLoadingData) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading movies...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if data failed to load
+  if (!data) {
+    return (
+      <div className="container mx-auto py-10">
+        <div className="flex flex-col items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-2">Failed to load movies</h1>
+            <p className="text-muted-foreground mb-4">
+              Please try refreshing the page
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+            >
+              Refresh Page
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show movie content if user is authenticated and data is loaded
   const topMovies = [...data.movies]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 3);

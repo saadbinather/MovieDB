@@ -1,145 +1,128 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Film } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Film, Library, TrendingUp } from "lucide-react";
-import data from "../data/movies.json";
+interface Genre {
+  id: string;
+  name: string;
+}
 
 export default function GenresPage() {
-  // Group movies by genre and add them to each genre object
-  const genresWithMovies = data.genres.map((genre) => {
-    const genreMovies = data.movies.filter(
-      (movie) => movie.genreId === genre.id
-    );
-    return {
-      ...genre,
-      movies: genreMovies.map((movie) => movie.title),
+  const [genres, setGenres] = useState<Genre[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Fetch genres from API
+  useEffect(() => {
+    const fetchGenres = async () => {
+      try {
+        const response = await fetch("/api/genres");
+        if (response.ok) {
+          const genresData = await response.json();
+          setGenres(genresData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch genres data",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching genres:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch genres data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
-  });
 
-  return (
-    <ProtectedRoute>
-      <div className="container mx-auto py-10">
-        {/* Header Section */}
-        <div className="flex flex-col items-center mb-10 space-y-4">
-          <div className="flex items-center gap-2">
-            <Library className="h-8 w-8" />
-            <h1 className="text-4xl font-bold text-center">Movie Genres</h1>
+    fetchGenres();
+  }, [toast]);
+
+  const renderGenreCard = (genre: Genre) => {
+    return (
+      <Card
+        key={genre.id}
+        className="group relative overflow-hidden bg-gradient-to-br from-background to-muted/20 border border-border hover:border-primary/50 hover:shadow-xl transition-all duration-300 rounded-xl cursor-pointer transform hover:scale-105"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        <CardHeader className="relative z-10 text-center py-8">
+          <div className="flex flex-col items-center space-y-3">
+            <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors duration-300">
+              <Film className="h-6 w-6 text-primary" />
+            </div>
+            <CardTitle className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+              {genre.name}
+            </CardTitle>
           </div>
-          <p className="text-muted-foreground text-lg text-center max-w-2xl">
-            "This is Cinema"
-          </p>
-        </div>
+        </CardHeader>
+      </Card>
+    );
+  };
 
-        {/* Genres Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
-          {genresWithMovies.map((genre) => (
-            <Card
-              key={genre.id}
-              className="group hover:shadow-lg transition-all duration-300"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <CardTitle className="text-2xl group-hover:text-primary transition-colors">
-                      {genre.name}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">
-                        <Film className="h-3 w-3 mr-1" />
-                        {genre.movies.length} Movies
-                      </Badge>
-                      <Badge variant="outline" className="text-xs">
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                        Popular
-                      </Badge>
-                    </div>
-                  </div>
+  const content = (
+    <div className="container mx-auto py-10 px-4">
+      <div className="flex flex-col items-center mb-12">
+        <div className="flex items-center space-x-3 mb-4">
+          <Film className="h-8 w-8 text-primary" />
+          <h1 className="text-4xl font-bold text-foreground">Movie Genres</h1>
+        </div>
+        <p className="text-muted-foreground text-center text-lg max-w-2xl">
+          Discover and explore different movie genres
+        </p>
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {[...Array(10)].map((_, i) => (
+            <Card key={i} className="overflow-hidden rounded-xl">
+              <CardHeader className="text-center py-8">
+                <div className="flex flex-col items-center space-y-3">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <Skeleton className="h-6 w-24" />
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <CardDescription className="text-sm leading-relaxed">
-                  {genre.description}
-                </CardDescription>
-
-                <div className="space-y-2">
-                  <h3 className="text-sm font-medium text-muted-foreground">
-                    Popular Movies
-                  </h3>
-                  <ScrollArea className="h-24 w-full rounded-md border p-2">
-                    <div className="space-y-2">
-                      {genre.movies.map((movie, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2 text-sm hover:bg-accent hover:text-accent-foreground p-2 rounded-md transition-colors"
-                        >
-                          <span className="h-2 w-2 rounded-full bg-primary/50" />
-                          {movie}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </div>
-              </CardContent>
             </Card>
           ))}
         </div>
-
-        {/* Stats Section */}
-        <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Total Genres</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {genresWithMovies.length}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Available categories
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Most Popular</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {genresWithMovies[0]?.name || "N/A"}
-              </div>
-              <p className="text-muted-foreground text-sm">
-                Highest movie count
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Total Movies</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {genresWithMovies.reduce(
-                  (acc, genre) => acc + genre.movies.length,
-                  0
-                )}
-              </div>
-              <p className="text-muted-foreground text-sm">Across all genres</p>
-            </CardContent>
-          </Card>
+      ) : genres.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {genres.map(renderGenreCard)}
         </div>
-      </div>
-    </ProtectedRoute>
+      ) : (
+        <div className="text-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="p-4 rounded-full bg-muted">
+              <Film className="h-12 w-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground">
+              No Genres Found
+            </h3>
+            <p className="text-muted-foreground mb-6 max-w-md">
+              We couldn't find any genres at the moment. Please try again later.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+              className="px-6"
+            >
+              Reload Page
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
   );
+
+  return <ProtectedRoute>{content}</ProtectedRoute>;
 }

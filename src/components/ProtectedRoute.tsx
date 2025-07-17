@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -9,17 +9,19 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, isLoading } = useAuth();
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (status === "loading") return; // Still loading
+
+    if (!session) {
       router.push("/");
     }
-  }, [user, isLoading, router]);
+  }, [session, status, router]);
 
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (status === "loading") {
     return (
       <div className="container mx-auto py-10">
         <div className="flex flex-col items-center justify-center min-h-[50vh]">
@@ -31,7 +33,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Don't render anything if user is not authenticated
-  if (!user) {
+  if (!session) {
     return null;
   }
 

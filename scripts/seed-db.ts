@@ -1,4 +1,4 @@
-import { connectDB } from "../src/lib/mongodb";
+import { connectToDatabase } from "../src/lib/mongodb";
 import Movie from "../src/models/Movie";
 import Genre from "../src/models/Genre";
 import Director from "../src/models/Director";
@@ -33,8 +33,7 @@ interface DirectorData {
 
 async function seedDatabase() {
   try {
-
-    await connectDB();
+    await connectToDatabase();
     console.log("Connected to MongoDB");
 
     // Read data from JSON files

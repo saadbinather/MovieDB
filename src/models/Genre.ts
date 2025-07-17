@@ -11,14 +11,6 @@ const genreSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    description: {
-      type: String,
-      required: false,
-    },
-    movies: {
-      type: [String],
-      default: [],
-    },
   },
   {
     timestamps: true,

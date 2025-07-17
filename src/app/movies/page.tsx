@@ -29,25 +29,75 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Star, Filter, ChevronDown, Heart } from "lucide-react";
-import data from "../data/movies.json";
 
-type SortOption = "rating-desc" | "rating-asc" | "title-asc" | "year-desc";
+interface Movie {
+  id: string;
+  title: string;
+  description: string;
+  releaseYear: number;
+  rating: number;
+  directorId: string;
+  genreId: string;
+  posterUrl: string;
+  url?: string;
+}
+
+interface Genre {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface Director {
+  id: string;
+  name: string;
+  biography: string;
+  url: string;
+}
+
+interface ApiData {
+  movies: Movie[];
+  genres: Genre[];
+  directors: Director[];
+}
 
 export default function MoviesPage() {
-  const [movies, setMovies] = useState(data.movies);
+  const [data, setData] = useState<ApiData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortOption, setSortOption] = useState<SortOption>("rating-desc");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [sortBy, setSortBy] = useState("rating-desc");
   const { toast } = useToast();
 
-  // Simulate loading for better UX
+  // Fetch data from API
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/data");
+        if (response.ok) {
+          const apiData = await response.json();
+          setData(apiData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch movie data",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch movie data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
 
   const toggleFavorite = (movieId: string) => {
     const newFavorites = new Set(favorites);
@@ -67,54 +117,44 @@ export default function MoviesPage() {
     setFavorites(newFavorites);
   };
 
-  // Sort movies based on selected option
-  const getSortedMovies = (movies: any[], sortOption: SortOption) => {
-    const sorted = [...movies];
-
-    switch (sortOption) {
-      case "rating-desc":
-        return sorted.sort((a, b) => b.rating - a.rating);
-      case "rating-asc":
-        return sorted.sort((a, b) => a.rating - b.rating);
-      case "title-asc":
-        return sorted.sort((a, b) => a.title.localeCompare(b.title));
-      case "year-desc":
-        return sorted.sort((a, b) => b.releaseYear - a.releaseYear);
-      default:
-        return sorted;
-    }
-  };
-
-  const sortedMovies = getSortedMovies(movies, sortOption);
-
-  const filteredMovies = sortedMovies.filter((movie) =>
-    movie.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getSortOptionLabel = (option: SortOption) => {
-    switch (option) {
-      case "rating-desc":
-        return "Rating (High to Low)";
-      case "rating-asc":
-        return "Rating (Low to High)";
-      case "title-asc":
-        return "Title (A-Z)";
-      case "year-desc":
-        return "Release Year";
-      default:
-        return "Sort by";
-    }
-  };
-
   const getGenreById = (genreId: string) => {
-    return data.genres.find((genre) => genre.id === genreId);
+    return data?.genres.find((genre) => genre.id === genreId);
   };
 
   const getDirectorById = (directorId: string) => {
-    return data.directors.find((director) => director.id === directorId);
+    return data?.directors.find((director) => director.id === directorId);
   };
 
-  const renderMovieCard = (movie: any) => {
+  // Sort and filter movies
+  const getSortedAndFilteredMovies = () => {
+    if (!data) return [];
+
+    let filteredMovies = data.movies.filter((movie) =>
+      movie.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    // Sort movies based on selected option
+    switch (sortBy) {
+      case "rating-desc":
+        filteredMovies.sort((a, b) => b.rating - a.rating);
+        break;
+      case "rating-asc":
+        filteredMovies.sort((a, b) => a.rating - b.rating);
+        break;
+      case "title-asc":
+        filteredMovies.sort((a, b) => a.title.localeCompare(b.title));
+        break;
+      case "year-desc":
+        filteredMovies.sort((a, b) => b.releaseYear - a.releaseYear);
+        break;
+      default:
+        filteredMovies.sort((a, b) => b.rating - a.rating);
+    }
+
+    return filteredMovies;
+  };
+
+  const renderMovieCard = (movie: Movie) => {
     const genre = getGenreById(movie.genreId);
     const director = getDirectorById(movie.directorId);
     const isFavorite = favorites.has(movie.id);
@@ -190,6 +230,14 @@ export default function MoviesPage() {
             {movie.description}
           </p>
         </CardContent>
+
+        <CardFooter className="pt-0">
+          <Link href={`/movies/${movie.id}`} className="w-full">
+            <Button className="w-full" variant="outline">
+              View Details
+            </Button>
+          </Link>
+        </CardFooter>
       </Card>
     );
   };
@@ -216,24 +264,24 @@ export default function MoviesPage() {
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="flex items-center gap-2">
               <Filter className="h-4 w-4" />
-              {getSortOptionLabel(sortOption)}
+              Sort by
               <ChevronDown className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>Sort Options</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => setSortOption("rating-desc")}>
+            <DropdownMenuItem onClick={() => setSortBy("rating-desc")}>
               Rating (High to Low)
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortOption("rating-asc")}>
+            <DropdownMenuItem onClick={() => setSortBy("rating-asc")}>
               Rating (Low to High)
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortOption("title-asc")}>
+            <DropdownMenuItem onClick={() => setSortBy("title-asc")}>
               Title (A-Z)
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setSortOption("year-desc")}>
-              Release Year
+            <DropdownMenuItem onClick={() => setSortBy("year-desc")}>
+              Release Year (Newest)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -264,13 +312,26 @@ export default function MoviesPage() {
             </Card>
           ))}
         </div>
-      ) : (
+      ) : data ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredMovies.map(renderMovieCard)}
+          {getSortedAndFilteredMovies().map(renderMovieCard)}
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">
+            Failed to load movies. Please try again.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => window.location.reload()}
+            className="mx-auto"
+          >
+            Reload Page
+          </Button>
         </div>
       )}
 
-      {!isLoading && filteredMovies.length === 0 && (
+      {data && getSortedAndFilteredMovies().length === 0 && !isLoading && (
         <div className="text-center py-12">
           <p className="text-muted-foreground mb-4">
             No movies found matching your search.

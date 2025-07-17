@@ -7,64 +7,87 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardHeader,
+  CardTitle,
   CardFooter,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Star, Film } from "lucide-react";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Star, Film, Award } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
-type Director = {
+interface Movie {
+  id: string;
+  title: string;
+  description: string;
+  releaseYear: number;
+  rating: number;
+  directorId: string;
+  genreId: string;
+  posterUrl: string;
+  url?: string;
+}
+
+interface Genre {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface Director {
   id: string;
   name: string;
   biography: string;
   url: string;
-};
+}
 
-type Movie = {
-  id: string;
-  title: string;
-  directorId: string;
-  rating: number;
-  releaseYear: number;
-};
-
-type MovieData = {
+interface ApiData {
   movies: Movie[];
+  genres: Genre[];
   directors: Director[];
-};
+}
 
-export default function Directors() {
-  const [data, setData] = useState<MovieData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
+export default function DirectorsPage() {
+  const [data, setData] = useState<ApiData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const { toast } = useToast();
 
+  // Fetch data from API
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/data.json");
-        if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-        const json = await res.json();
-        setData(json);
-        // Simulate loading for better UX
-        setTimeout(() => setIsLoading(false), 1000);
+        const response = await fetch("/api/data");
+        if (response.ok) {
+          const apiData = await response.json();
+          setData(apiData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch directors data",
+            variant: "destructive",
+          });
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Failed to load directors data");
+        toast({
+          title: "Error",
+          description: "Failed to fetch directors data",
+          variant: "destructive",
+        });
+      } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
-
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  }, [toast]);
 
   const filteredDirectors =
     data?.directors.filter((director) =>
@@ -72,9 +95,9 @@ export default function Directors() {
     ) || [];
 
   const renderDirectorCard = (director: Director) => {
-    const directorMovies = data!.movies.filter(
-      (m) => m.directorId === director.id
-    );
+    const directorMovies =
+      data?.movies.filter((m) => m.directorId === director.id) || [];
+
     const avgRating =
       directorMovies.length > 0
         ? (
@@ -82,6 +105,7 @@ export default function Directors() {
             directorMovies.length
           ).toFixed(1)
         : "N/A";
+
     const latestMovie = directorMovies.reduce(
       (latest, current) =>
         current.releaseYear > (latest?.releaseYear || 0) ? current : latest,
@@ -193,6 +217,22 @@ export default function Directors() {
             : // Actual director cards
               filteredDirectors.map((director) => renderDirectorCard(director))}
         </div>
+
+        {/* No results message */}
+        {!isLoading && filteredDirectors.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-600 mb-4">
+              No directors found matching your search.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setSearchTerm("")}
+              className="mx-auto"
+            >
+              Clear Search
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

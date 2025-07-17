@@ -1,9 +1,8 @@
 "use client";
 
-import { promises as fs } from "fs";
-import path from "path";
+import { useState, useEffect } from "react";
+import { useParams, notFound } from "next/navigation";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Star, Clock, Film } from "lucide-react";
@@ -17,11 +16,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/hooks/use-toast";
 
 interface Movie {
   id: string;
@@ -32,6 +28,7 @@ interface Movie {
   posterUrl: string;
   genreId: string;
   directorId: string;
+  url?: string;
 }
 
 interface Genre {
@@ -47,32 +44,99 @@ interface Director {
   url: string;
 }
 
-interface MovieData {
+interface ApiData {
   movies: Movie[];
   genres: Genre[];
   directors: Director[];
 }
 
-export default async function MovieDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const filePath = path.join(process.cwd(), "src/app/data/movies.json");
-  const data = await fs.readFile(filePath, "utf8");
-  const movieData: MovieData = JSON.parse(data);
+export default function MovieDetailPage() {
+  const params = useParams();
+  const movieId = params.id as string;
 
-  const movie = movieData.movies.find((m) => m.id === params.id);
+  const [data, setData] = useState<ApiData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Fetch data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("/api/data");
+        if (response.ok) {
+          const apiData = await response.json();
+          setData(apiData);
+        } else {
+          toast({
+            title: "Error",
+            description: "Failed to fetch movie data",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch movie data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row gap-8 mb-8">
+            <div className="lg:w-1/3">
+              <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+            </div>
+            <div className="lg:w-2/3 space-y-4">
+              <Skeleton className="h-10 w-3/4" />
+              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  if (!data) {
+    return (
+      <ProtectedRoute>
+        <div className="container mx-auto px-4 py-8">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Error Loading Movie</h1>
+            <p className="text-muted-foreground mb-4">
+              Failed to load movie data. Please try again.
+            </p>
+            <Button onClick={() => window.location.reload()}>
+              Reload Page
+            </Button>
+          </div>
+        </div>
+      </ProtectedRoute>
+    );
+  }
+
+  const movie = data.movies.find((m) => m.id === movieId);
+
   if (!movie) {
     notFound();
   }
 
-  const genre = movieData.genres.find((g) => g.id === movie.genreId);
-  const director = movieData.directors.find((d) => d.id === movie.directorId);
+  const genre = data.genres.find((g) => g.id === movie.genreId);
+  const director = data.directors.find((d) => d.id === movie.directorId);
 
-  const relatedMovies = movieData.movies
+  const relatedMovies = data.movies
     .filter((m) => m.genreId === movie.genreId && m.id !== movie.id)
-    .slice(0, 2);
+    .slice(0, 3);
 
   const content = (
     <div className="container mx-auto px-4 py-8">
@@ -132,6 +196,15 @@ export default async function MovieDetailPage({
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-bold mb-4">About This Movie</h2>
           <p className="text-gray-600 leading-relaxed">{movie.description}</p>
+
+          {genre && (
+            <div className="mt-6 p-4 bg-muted rounded-lg">
+              <h3 className="font-semibold mb-2">About {genre.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                {genre.description}
+              </p>
+            </div>
+          )}
         </div>
 
         <div>
@@ -156,6 +229,41 @@ export default async function MovieDetailPage({
           </div>
         </div>
       </div>
+
+      {/* Related Movies */}
+      {relatedMovies.length > 0 && (
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">More {genre?.name} Movies</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedMovies.map((relatedMovie) => (
+              <Link key={relatedMovie.id} href={`/movies/${relatedMovie.id}`}>
+                <Card className="hover:shadow-lg transition-shadow">
+                  <div className="aspect-[2/3] relative overflow-hidden rounded-t-lg">
+                    <Image
+                      src={relatedMovie.posterUrl}
+                      alt={`${relatedMovie.title} poster`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      {relatedMovie.title}
+                    </CardTitle>
+                    <CardDescription>
+                      <div className="flex items-center gap-2">
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <span>{relatedMovie.rating.toFixed(1)}/10</span>
+                        <span>• {relatedMovie.releaseYear}</span>
+                      </div>
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Navigation */}
       <div className="mt-12 flex justify-center">
