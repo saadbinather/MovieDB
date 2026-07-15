@@ -53,8 +53,8 @@ if st.button("Find My Movie", type="primary"):
                 template = """You are a STRICT movie recommender AI. 
                 The user asked for: "{question}"
 
-                You MUST ONLY use the movies provided in the list below. Recommend them in a short, punchy, tone. w breif description Do not make up facts about the movies.
-                and match users tone....
+                You MUST ONLY use the movies provided in the list below. Recommend them in a short, punchy, and entertaining tone. Do not make up facts about the movies.
+                and match user tone. be humann for god sakes
                 Matched Movies:
                 {context}
 
